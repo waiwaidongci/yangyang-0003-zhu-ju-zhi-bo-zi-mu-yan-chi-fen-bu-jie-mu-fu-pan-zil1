@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
 from core import db, enqueue, require
+from sla_service import compute_release_segment, refresh_pending_release
 from subtitles import (
     allow_alignment, anchors_for, build_diagnosis, change_repair, open_repair, repair_for,
     save_anchor, segment,
@@ -82,6 +83,7 @@ def attach_recording(code: str, recording: Recording, user=operate):
 @router.put("/rundown/{code}/alignment")
 def put_anchor(code: str, anchor: Anchor, user=operate):
     with db() as cx:
+        refresh_pending_release(cx, code)
         save_anchor(cx, code, anchor)
         return {"cue_no": anchor.cue_no}
 
@@ -113,9 +115,11 @@ def apply_repair_action(code: str, action: RepairAction, data: EditRequest,
 
 
 def run_job(cx, kind, payload):
-    if kind != "caption-ecdf":
-        raise ValueError(f"Unknown caption job: {kind}")
-    return build_diagnosis(cx, payload["code"], payload["revision"])
+    if kind == "caption-ecdf":
+        return build_diagnosis(cx, payload["code"], payload["revision"])
+    if kind == "sla-release-segment":
+        return compute_release_segment(cx, payload["release_id"], payload["code"])
+    raise ValueError(f"Unknown caption job: {kind}")
 
 
 def seed(cx):

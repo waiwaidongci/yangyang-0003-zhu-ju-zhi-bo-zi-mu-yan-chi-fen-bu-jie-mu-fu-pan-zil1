@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 import domain
 from incident_api import router as incident_router
 from quality_api import router as quality_router
+from sla_api import router as sla_router
 from track_api import router as track_router
 from core import CACHE, db, initialize, password_hash, require, token_for
 from scripts.seed_demo import seed_all
@@ -39,6 +40,7 @@ app.include_router(domain.router)
 app.include_router(quality_router)
 app.include_router(track_router)
 app.include_router(incident_router)
+app.include_router(sla_router)
 
 @app.middleware("http")
 async def audit(request: Request, call_next):

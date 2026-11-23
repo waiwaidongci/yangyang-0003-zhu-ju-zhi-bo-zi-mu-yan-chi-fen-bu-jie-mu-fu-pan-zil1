@@ -87,9 +87,9 @@ def open_repair(cx, code):
     if problem is None:
         raise HTTPException(409, "暂无超时字幕需要返修")
     return cx.execute(
-        """INSERT INTO caption_repair(segment_code,start_ms,end_ms)
-           VALUES (%s,%s,%s) RETURNING *""",
-        (code, *problem)
+        """INSERT INTO caption_repair(segment_code,start_ms,end_ms,sla_ms)
+           VALUES (%s,%s,%s,%s) RETURNING *""",
+        (code, *problem, current["sla_ms"])
     ).fetchone()
 
 
@@ -116,9 +116,11 @@ def change_repair(cx, code, action, corrected_ref, note, reviewer):
                 raise HTTPException(422, "请填写与源录音不同的补字幕文件")
             if current["anchor_revision"] != current["diagnosis_revision"]:
                 raise HTTPException(409, "锚点已调整，请先重算返修时间码")
-            repair_range = current["diagnosis"]["repair_range"]
-            if repair_range is None:
-                raise HTTPException(409, "当前锚点未检出超时字幕，请核对原始直播锚点")
+            if repair["sla_ms"] is None or repair["sla_ms"] == current["sla_ms"]:
+                repair_range = current["diagnosis"]["repair_range"]
+                if repair_range is None:
+                    raise HTTPException(409, "当前锚点未检出超时字幕，请核对原始直播锚点")
+            # 时限发布后开单的工作包保留开单依据，不按新版诊断改写范围
     if action == "return" and not note:
         raise HTTPException(422, "请填写退回说明")
     return cx.execute(

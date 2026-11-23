@@ -27,6 +27,10 @@
 
 少于 5 个锚点不计算。后台任务按锚点版本运行，过期结果不会覆盖当前版本。交接要求源录音和至少 80% 的锚点覆盖。每个节目段允许一条可退回修订的补字幕工作包。演示以文件名引用外部素材，实际听审和字幕文件保存由编辑工作站完成。
 
+## 整档时限调整
+
+值班台可对整档节目收紧或放宽上屏时限：提交后为每个节目段按新时限在后台重算延迟诊断，全部就绪才在一个事务里切换各段的时限与诊断，任何一段失败则整档保留旧版。重算期间锚点照常修订，改过的节目段按最新锚点重新计算。同一申请按申请键重试返回既有发布，不新增版本；同一节目同时只有一个进行中的发布。切换前开单的补字幕工作包按旧版诊断划定范围并保留开单依据，切换后新开的工作包按新版诊断划范围。延迟诊断页展示当前生效时限和最近一次发布的进度。
+
 ## 运行
 
 ```sh
@@ -53,9 +57,9 @@ docker compose exec -T backend python -m scripts.seed_demo
 本地开发时运行数据库和 Redis，给后端进程传入 `DATABASE_URL`、`REDIS_URL`、`JWT_SECRET` 和 `SEED_DEMO=true`，进入 `backend` 安装 `requirements.txt` 并执行 `uvicorn app:app --reload` 和 `python worker.py`。前端开发以同源 `/api/` 代理运行。Compose 可用 `docker compose stop` 保留数据，测试后可用 `docker compose down -v` 删除该项目的演示卷。
 
 - `backend/schema.sql` 定义节目段、锚点和补字幕包。
-- `backend/domain.py` 管理 API、权限、输入 schema 和演示 fixture。 `subtitles.py` 实现带锁工作流，`timing.py` 实现延迟诊断。
+- `backend/domain.py` 管理 API、权限、输入 schema 和演示 fixture。 `subtitles.py` 实现带锁工作流，`timing.py` 实现延迟诊断。`sla_service.py` 与 `sla_api.py` 实现整档时限的暂存重算与原子切换。
 - `frontend/cues.js` 管理节目段选择、接口路径、业务组件及时间码格式，`studio.js` 提供四个页面的操作。
-- 共享枚举有账号角色（`backend/core.py`、`frontend/base.js`、本页权限表）、后台状态（`backend/core.py`、`backend/worker.py`、`frontend/base.js`）、补字幕状态（`backend/schema.sql`、`backend/subtitles.py`、`frontend/cues.js`、`frontend/studio.js`）和延迟模式（`backend/timing.py`、`frontend/cues.js`、`frontend/studio.js`）。
+- 共享枚举有账号角色（`backend/core.py`、`frontend/base.js`、本页权限表）、后台状态（`backend/core.py`、`backend/worker.py`、`frontend/base.js`）、补字幕状态（`backend/schema.sql`、`backend/subtitles.py`、`frontend/cues.js`、`frontend/studio.js`）、延迟模式（`backend/timing.py`、`frontend/cues.js`、`frontend/studio.js`）和时限发布状态（`backend/migrations/040_sla_release.sql`、`backend/sla_service.py`、`frontend/studio.js`）。
 
 许可证见 `LICENSE`。
 
