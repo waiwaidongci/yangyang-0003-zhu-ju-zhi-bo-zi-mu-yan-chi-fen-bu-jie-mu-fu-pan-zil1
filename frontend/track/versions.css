@@ -1,0 +1,10 @@
+.track-layout {display:grid;grid-template-columns:minmax(0,1.8fr) minmax(15rem,1fr);gap:1rem;align-items:start}
+.track-versions {list-style:none;padding:0}
+.track-sleeve {display:grid;grid-template-columns:3rem minmax(0,1fr) auto;gap:.85rem;align-items:center;padding:.8rem .35rem;border-top:1px solid var(--studio-line)}
+.track-sleeve > div {display:grid;gap:.35rem;overflow-wrap:anywhere}
+.track-sleeve div span,.track-sleeve small {color:var(--studio-muted);font-size:.8rem}
+.track-sleeve[data-unsigned="true"] .track-rev {color:var(--studio-orange)}
+.track-rev {color:var(--studio-green);font:700 1.55rem var(--studio-heading)}
+.track-action button {justify-self:start}
+.track-source {border-top:4px solid var(--studio-green)}
+@media(max-width:760px){.track-layout{grid-template-columns:1fr}.track-sleeve{grid-template-columns:2rem 1fr}.track-action{grid-column:2}}

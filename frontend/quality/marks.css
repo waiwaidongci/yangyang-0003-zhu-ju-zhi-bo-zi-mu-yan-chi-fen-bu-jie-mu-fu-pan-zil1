@@ -1,0 +1,13 @@
+.quality-split {display:grid;grid-template-columns:minmax(0,2.1fr) minmax(15rem,1fr);gap:1rem;align-items:start}
+.quality-marks {list-style:none;padding:0}
+.mark-row {border-top:1px solid var(--studio-line);padding:.7rem 0;display:grid;gap:.55rem}
+.mark-row > div {display:grid;grid-template-columns:auto minmax(7rem,1fr) auto;gap:.6rem;align-items:center}
+.mark-row small,.quality-tickets dt {color:var(--studio-muted)}
+.mark-issues {grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.4rem}
+.mark-issues:empty {display:none}
+.mark-issues > span {border:1px solid var(--studio-line);color:var(--studio-orange);padding:.1rem .35rem}
+.studio .mark-edit {display:grid;grid-template-columns:.8fr 1fr .8fr auto;align-items:end;gap:.55rem;margin-top:0}
+.quality-aside {border-top:3px solid var(--studio-orange)}
+.quality-tickets div {border-top:1px solid var(--studio-line);padding:.5rem 0}
+.quality-tickets dd {margin:0}
+@media(max-width:760px) {.quality-split{grid-template-columns:1fr}.studio .mark-edit{grid-template-columns:1fr 1fr}}
